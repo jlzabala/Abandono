@@ -1,0 +1,178 @@
+---
+title: "Experimentos No Determinísticos"
+output: github_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## <span style="color:black">*1. Ejercicios de Experimentos No Determinísticos* </span>
+### <span style="color:black">*1.1. Simulaciones* </span>
+
+### En está práctica de simulaciones se utiliza principalmente las siguientes funciones:
+* **set.seed**, para fijar una semilla y contar siempre con el mismo resultado
+* **sample, en este caso se utiliza para generar una muestra de números aleatorios
+* **size**, determina el tamaño de la muestra
+* **replace**, True si queremos que exista reemplazamiento, caso contrario False
+* **table**, que crea una tabla de frecuencias
+* **freq**, muestra una tabal de frecuencias completa
+* **plot**, o hist para graficar
+* **cbind**, para unir dos vectores en columnas
+* **pnorm**, permite calcular la función de distribución acumulada de la distribución normal
+
+Nota: Previamente se deben tener cargadas las librerias que permiten llamar a las funciones.
+
+### <span style="color:black">*1.1.1 Lanzamiento de moneda 1285 veces* </span>
+
+```{r, echo=TRUE}
+
+
+set.seed(1234)
+resul1 <- sample(c("cara", "sello"),
+                 size = 1285, replace=T)
+print(resul1)
+
+freq1 <- table(resul1)
+freq1
+plot(freq1,main="Gráfico 1: Histograma del experimento lanzamiento de una moneda")
+resul2 <- ifelse(resul1=="cara",0,1)
+resul2
+
+hist(resul2,main="Gráfico 2: Histograma del experimento lanzamiento de una moneda", 
+     ylab="Frecuencias",
+     col=c("green","yellow"))
+```
+
+```{r, echo=TRUE, warning=FALSE}
+library("descr")
+freq2 <- freq(resul1, 
+              main = "Gráfico 3: Frecuencias del experimento lanzamiento de una moneda",
+              col=c("green","yellow"))
+freq2
+tab <- freq2
+dim(tab)
+fx <- tab[,2]/100
+fx
+tab <- cbind(tab,fx)
+print(tab)
+
+```
+
+### <span style="color:black">*1.1.2 Lanzamiento de un dado 1100 veces* </span>
+```{r, echo=TRUE, warning=FALSE}
+
+dado <- c(1,2,3,4,5,6)
+simuld <- NULL
+nd <- 1100
+simuld <- sample(dado, nd, replace = TRUE)
+simuld
+t2 <- table(simuld)
+t2
+t2p <- prop.table(t2)
+addmargins(t2p)
+
+
+
+### Ahora realizaremos un gráfico de la distribución de las frecuencias relativas utilizando la librería ggplot
+
+library (ggplot2)
+t2p <- as.data.frame(t2p)
+ggplot(t2p, aes(x=simuld, y=Freq, label=Freq)) + 
+  geom_point(stat='identity', fill="green", size=8)  +
+  geom_segment(aes(x = simuld, 
+                   xend = simuld, 
+                   y = 0, 
+                   yend = Freq), 
+               color = "green") +
+  geom_text(color="red", size=2) +
+  labs(title="Gráfico 4: Distribución de frecuencias lanzamiento de un dado 1100 veces",
+       x = "Cara del dado",y = "Frecuencias") 
+
+```
+
+ 
+
+### <span style="color:black">*1.1.3 Selección de los estudiantes con edades en el rango de 17 A 50 años* </span>
+```{r, echo=TRUE, warning=FALSE}
+
+set.seed(1234)
+ed_u <- sample(17:50, size=320,replace=T)
+freq4 <-freq(ed_u,plot=T, col=rainbow(5), main="Gráfico 5: Distribución de Frecuencias edades")
+tab <- freq4
+fx <- tab[,2]/100
+tb <- cbind(tab,fx)
+
+colnames(tb) <- c("Frecuencia","%","fx")
+print(tb)
+
+```
+
+### <span style="color:black">*2. Gráficas de las funciones de probabilidad y de las distribuciones de la función de variables aleatorias* </span>
+
+### <span style="color:black">*2.1. Simulaciones* </span>
+
+### <span style="color:black">*2.1.1 Variables aletorias discretas* </span>
+
+```{r, echo=TRUE}
+rm(list=ls())
+set.seed(1234)
+edad <- sample (17:50, 200, replace=T)
+freq5 <- freq(edad,plot=F) 
+plot(freq5, main="Gráfico 6: Histograma de la Edad",
+     xlab="Edades",
+     ylab="Frecuencias",
+     col=rainbow(10))
+```
+
+
+
+
+```{r, echo=TRUE}
+tab5 <- freq5
+fx <- tab5[,2]/100
+Fx <- cumsum(fx)
+tab5 <- cbind(tab5,fx,Fx)
+tab5
+n <- length(tab5[,1])
+tab5[n,3:4] <- NA
+edad1 <- seq(17,51)
+## Gráfico
+plot(tab5[,3],  main="Gráfico 7:Función Densidad Edad")
+
+par(mfrow=c(1,2))
+plot(edad1,tab5[,3], type = "b", main="Gráfico 8:\nFunción Densidad Edad",
+     xlab="Edades",
+     ylab="f(x)",
+     xlim=c(17,50))
+
+plot(edad1,tab5[,4], type = "b", main="Gráfico 9: \nFunción Dist, Acumulada Edad",
+     xlab="Edades",
+     ylab="F(x)")
+```
+
+### <span style="color:black">*2.1.1 Variables aletorias continuas* </span>
+
+```{r, echo=T}
+
+par(mfrow=c(1,2))
+z <- seq(-5,5,0.5)
+fz <-(1/sqrt(2*pi))*exp(-(z^2/2))
+Fz <- pnorm(z,0,1)
+plot(z,fz,main="Gráfico  10: \nDist. normal estandarizada - fz",
+     type="l",
+     xlab="Valores Z",
+     ylab="f(z)")
+
+abline(v=0,col="red",lty=3)
+
+plot(z,Fz,main="Gráfico 11: \nDist. normal estandarizada - Fz",
+     type="l",
+     xlab="Valores Z",
+     ylab="F(z)")
+
+
+```
+
