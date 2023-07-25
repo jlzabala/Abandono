@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### En está práctica de simulaciones se utiliza principalmente las siguientes funciones:
 * **set.seed**, para fijar una semilla y contar siempre con el mismo resultado
-* **sample, en este caso se utiliza para generar una muestra de números aleatorios
+* **sample**, en este caso se utiliza para generar una muestra de números aleatorios
 * **size**, determina el tamaño de la muestra
 * **replace**, True si queremos que exista reemplazamiento, caso contrario False
 * **table**, que crea una tabla de frecuencias
